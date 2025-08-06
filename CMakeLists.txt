@@ -1,12 +1,12 @@
-project(codal-microbit-nrf5sdk)
+project(codal-microbit-nrf54sdk)
 
 # Set SUPPORT_NRF_LOG to True to compile files needed only for NRF_LOG_XXX
 set( SUPPORT_NRF_LOG True)
 
-# codal-nrf52 includes
+# codal-nrf54 includes
 
 list(APPEND INCLUDE_DIRS
-    "${CMAKE_CURRENT_SOURCE_DIR}/../codal-nrf52/nrfx/hal"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../codal-nrf54/nrfx/hal"
 )
 
 
@@ -256,17 +256,17 @@ include_directories(${INCLUDE_DIRS})
 include_directories(${INCLUDE_SDK_DIRS})
 
 # create our target
-add_library(codal-microbit-nrf5sdk ${SOURCE_FILES})
+add_library(codal-microbit-nrf54sdk ${SOURCE_FILES})
 
 target_link_libraries(
-    codal-microbit-nrf5sdk
-    codal-nrf52
+    codal-microbit-nrf54sdk
+    codal-nrf54
     codal-core
 )
 
 # expose it to parent cmake.
-target_include_directories(codal-microbit-nrf5sdk PUBLIC ${INCLUDE_DIRS})
-target_include_directories(codal-microbit-nrf5sdk PUBLIC ${INCLUDE_SDK_DIRS})
+target_include_directories(codal-microbit-nrf54sdk PUBLIC ${INCLUDE_DIRS})
+target_include_directories(codal-microbit-nrf54sdk PUBLIC ${INCLUDE_SDK_DIRS})
 
 # Suppress all warnings from this SDK as this is third party code
-target_compile_options(codal-microbit-nrf5sdk PRIVATE -w)
+target_compile_options(codal-microbit-nrf54sdk PRIVATE -w)
