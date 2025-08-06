@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"/Users/mannu/Development/CODAL/microbit-v2-samples/libraries/codal-microbit-nrf54sdk/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

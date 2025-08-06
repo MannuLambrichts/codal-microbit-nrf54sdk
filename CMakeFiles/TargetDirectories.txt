@@ -1,0 +1,3 @@
+/Users/mannu/Development/CODAL/microbit-v2-samples/libraries/codal-microbit-nrf54sdk/CMakeFiles/codal-microbit-nrf54sdk.dir
+/Users/mannu/Development/CODAL/microbit-v2-samples/libraries/codal-microbit-nrf54sdk/CMakeFiles/edit_cache.dir
+/Users/mannu/Development/CODAL/microbit-v2-samples/libraries/codal-microbit-nrf54sdk/CMakeFiles/rebuild_cache.dir

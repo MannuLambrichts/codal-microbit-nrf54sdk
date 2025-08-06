@@ -1,3 +1,6 @@
+cmake_minimum_required(VERSION 4.0)
+
+
 project(codal-microbit-nrf54sdk)
 
 # Set SUPPORT_NRF_LOG to True to compile files needed only for NRF_LOG_XXX

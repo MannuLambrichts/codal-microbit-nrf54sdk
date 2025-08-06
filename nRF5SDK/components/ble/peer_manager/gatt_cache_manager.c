@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015 - 2019, Nordic Semiconductor ASA
+ * Copyright (c) 2015 - 2021, Nordic Semiconductor ASA
  *
  * All rights reserved.
  *
@@ -250,6 +250,8 @@ static bool local_db_update_in_evt(uint16_t conn_handle)
             success = true;
             break;
 
+        case NRF_ERROR_INVALID_DATA:
+            /* Fallthrough */
         case BLE_ERROR_INVALID_CONN_HANDLE:
             /* Do nothing */
             break;
@@ -748,9 +750,7 @@ void gcm_ble_evt_handler(ble_evt_t const * p_ble_evt)
                 }
                 else
                 {
-                    uint16_t handle_value;
-                    memcpy(&handle_value, p_val->handle_value, sizeof(uint16_t));
-                    ret_code_t err_code = sd_ble_gattc_read(conn_handle, handle_value, 0);
+                    ret_code_t err_code = sd_ble_gattc_read(conn_handle, *(uint16_t*)p_val->handle_value, 0);
                     if (err_code == NRF_SUCCESS)
                     {
                         handle_found = true;

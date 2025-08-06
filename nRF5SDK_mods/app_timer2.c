@@ -69,6 +69,9 @@ NRF_LOG_MODULE_REGISTER();
 
 #define APP_TIMER_RTC_MAX_VALUE   (DRV_RTC_MAX_CNT - APP_TIMER_SAFE_WINDOW)
 
+/* Check if timer is idle */
+#define APP_TIMER_IS_IDLE(timer) (timer->end_val == APP_TIMER_IDLE_VAL)
+
 static drv_rtc_t m_rtc_inst = DRV_RTC_INSTANCE(1);
 
 #if APP_TIMER_WITH_PROFILER
@@ -162,13 +165,14 @@ static bool timer_expire(app_timer_t * p_timer)
     ASSERT(p_timer->handler);
     bool ret = false;
 
-    if ((m_global_active == true) && (p_timer != NULL) && (p_timer->active))
+    if ((m_global_active == true) && (p_timer != NULL) /* && (p_timer->active) */)
     {
         if (get_now() >= p_timer->end_val) {
             /* timer expired */
             if (p_timer->repeat_period == 0)
             {
-                p_timer->active = false;
+                //p_timer->active = false;
+                p_timer->end_val = APP_TIMER_IDLE_VAL;
             }
     #if APP_TIMER_CONFIG_USE_SCHEDULER
             app_timer_event_t timer_event;
@@ -184,7 +188,8 @@ static bool timer_expire(app_timer_t * p_timer)
             p_timer->handler(p_timer->p_context);
     #endif
             /* check active flag as it may have been stopped in the user handler */
-            if ((p_timer->repeat_period) && (p_timer->active))
+            //if ((p_timer->repeat_period) && (p_timer->active))
+            if ((p_timer->repeat_period) && !APP_TIMER_IS_IDLE(p_timer))
             {
                 p_timer->end_val += p_timer->repeat_period;
                 nrf_sortlist_add(&m_app_timer_sortlist, &p_timer->list_item);
@@ -271,7 +276,8 @@ static void sorted_list_stop_all(void)
         p_next = sortlist_pop();
         if (p_next)
         {
-            p_next->active = false;
+            //p_next->active = false;
+            p_next->end_val = APP_TIMER_IDLE_VAL;
         }
     } while (p_next);
 }
@@ -342,7 +348,8 @@ static void rtc_update(drv_rtc_t const * const  p_instance)
                 //Candidate has shorter timeout than current active timer. Candidate will replace active timer.
                 //Active timer is put back into sorted list.
                 rtc_reconf = true;
-                if (mp_active_timer->active)
+                //if (mp_active_timer->active)
+                if (!APP_TIMER_IS_IDLE(mp_active_timer))
                 {
                     NRF_LOG_INST_DEBUG(mp_active_timer->p_log, "Timer preempted.");
                     nrf_sortlist_add(&m_app_timer_sortlist, &mp_active_timer->list_item);
@@ -407,9 +414,11 @@ static void timer_req_process(drv_rtc_t const * const  p_instance)
         switch (p_req->type)
         {
             case TIMER_REQ_START:
-                if (!p_req->p_timer->active)
+                // TODO inconsistent with original app_timer2.c!!
+                //if (!p_req->p_timer->active)
+                if (!APP_TIMER_IS_IDLE(p_req->p_timer))
                 {
-                    p_req->p_timer->active = true;
+                    //p_req->p_timer->active = true;
                     nrf_sortlist_add(&m_app_timer_sortlist, &(p_req->p_timer->list_item));
                     NRF_LOG_INST_DEBUG(p_req->p_timer->p_log,"Start request (expiring at %d/0x%08x).",
                                                   p_req->p_timer->end_val, p_req->p_timer->end_val);
@@ -578,7 +587,9 @@ ret_code_t app_timer_start(app_timer_t * p_timer, uint32_t timeout_ticks, void *
     ASSERT(p_timer);
     app_timer_t * p_t = (app_timer_t *) p_timer;
 
-    if (p_t->active)
+    //if (p_t->active)
+    // TODO inconsistent with original app_timer2.c!!
+    if (!APP_TIMER_IS_IDLE(p_t))
     {
         return NRF_SUCCESS;
     }
@@ -599,7 +610,9 @@ ret_code_t app_timer_stop(app_timer_t * p_timer)
 {
     ASSERT(p_timer);
     app_timer_t * p_t = (app_timer_t *) p_timer;
-    p_t->active = false;
+    //p_t->active = false;
+    // TODO inconsistent with original app_timer2.c!!
+    p_t->end_val = APP_TIMER_IDLE_VAL;
 
     return timer_req_schedule(TIMER_REQ_STOP, p_t);
 }
